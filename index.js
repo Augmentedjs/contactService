@@ -1,5 +1,6 @@
 var express = require("express");
 var Augmented = require("augmentedjs");
+var Service = require("./lib/service.js");
 var bodyParser = require("body-parser");
 var MongoClient = require("mongodb").MongoClient;
 var assert = require("assert");
@@ -29,6 +30,8 @@ app.get("/about", function() {
 });
 
 app.get("/users", function (req, res) {
+
+
     collection.find().toArray(function(err, results) {
         res.send(results);
     });
@@ -37,6 +40,14 @@ app.get("/users", function (req, res) {
 app.get("/users/:id", function (req, res) {
     var id = Number(req.params.id);
     logger.debug("looking for " + id);
+    logger.debug("datasource " + app.datasource);
+
+    var user = new User({ "datasource": app.datasource, "id": id, "query": { "id": id }});
+    //console.info("User: " + JSON.stringify(user));
+    user.fetch();
+    res.send(user);
+
+    /*
     collection.find({ "ID": id }).toArray(function(err, results) {
         if (results && results.length > 0) {
             res.send(results[0]);
@@ -44,6 +55,7 @@ app.get("/users/:id", function (req, res) {
             res.send({});
         }
     });
+    */
 });
 
 app.post("/users", function(req, res) {
@@ -85,13 +97,13 @@ app.delete("/users/:id", function(req, res) {
 
 app.listen(PORT, function () {
 	logger.info("User Contact REST service listening on port " + PORT);
-    // Connect to the db
-    MongoClient.connect(URL, function(err, db) {
-        if(!err) {
-            logger.info("We are connected to MongoDB 'user' collection on 'contacts.'");
-            collection = db.collection("user");
-        } else {
-            logger.warn("No DB");
-        }
-    });
+    app.datasource = Augmented.Service.DataSourceFactory.getDatasource(
+        Augmented.Service.DataSourceFactory.Type.MongoDB, MongoClient);
+
+    var c = app.datasource.getConnection(URL, "user");
+    if (c) {
+        logger.info("We are connected to MongoDB 'user' collection on 'contacts.'");
+    } else {
+        logger.warn("No DB");
+    }
 });
