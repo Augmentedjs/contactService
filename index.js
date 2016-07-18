@@ -11,7 +11,7 @@ var Users = orm.Users;
 var URL = "mongodb://localhost:27017/contacts";
 var ABOUT = "User Contact REST Service for Node.js - Powered by Augmented.js version " + Augmented.VERSION;
 var PORT = 3000;
-var collection;
+//var collection;
 var logger = Augmented.Logger.LoggerFactory.getLogger(Augmented.Logger.Type.console, Augmented.Logger.Level.debug);
 var app = express();
 
@@ -30,42 +30,64 @@ app.get("/about", function() {
 });
 
 app.get("/users", function (req, res) {
-
-
-    collection.find().toArray(function(err, results) {
+    /*collection.find().toArray(function(err, results) {
         res.send(results);
+    });*/
+    var users = new Users({
+        "datasource": app.datasource
+    });
+
+    users.fetch({
+        "success": function() {
+            res.send(users);
+        },
+        "error": function(e) {
+            res.status(400).send("Failed to query users." + e);
+        }
     });
 });
 
-app.get("/users/:id", function (req, res) {
+app.get("/users/:id", function(req, res) {
     var id = Number(req.params.id);
-    logger.debug("looking for " + id);
-    logger.debug("datasource " + app.datasource);
+    /*logger.debug("looking for " + id);
+    logger.debug("datasource " + app.datasource);*/
+    var user = new User({
+        "datasource": app.datasource,
+        "id": id,
+        "query": { "ID": id }
+    });
 
-    var user = new User({ "datasource": app.datasource, "id": id, "query": { "id": id }});
-    //console.info("User: " + JSON.stringify(user));
-    user.fetch();
-    res.send(user);
-
-    /*
-    collection.find({ "ID": id }).toArray(function(err, results) {
-        if (results && results.length > 0) {
-            res.send(results[0]);
-        } else {
-            res.send({});
+    user.fetch({
+        "success": function() {
+            res.send(user);
+        },
+        "error": function(e) {
+            res.status(400).send("Failed to query user." + e);
         }
     });
-    */
 });
 
 app.post("/users", function(req, res) {
     var data = req.body;
-    logger.debug(JSON.stringify(data));
+    //logger.debug(JSON.stringify(data));
     var user = new User(data);
-    logger.debug(JSON.stringify(user));
+    user.datasource = app.datasource;
+
+    //logger.debug(JSON.stringify(user));
     if (user.isValid()) {
+        user.save({
+            "success": function() {
+                res.status(201).send(user);
+            },
+            "error": function(e) {
+                res.status(400).send("Failed to save user." + e);
+            }
+        });
+
+        /*
         collection.insert(user.toJSON());
         res.status(201).send(data);
+        */
     } else {
         res.status(400).send(user.validationMessages);
         logger.error(JSON.stringify(user.validationMessages));
@@ -74,10 +96,24 @@ app.post("/users", function(req, res) {
 
 app.put("/users/:id", function(req, res) {
     var id = Number(req.params.id);
-    var user = new User(data);
+    var user = new User({
+        "datasource": app.datasource,
+        "id": id,
+        "query": { "ID": id }
+    });
+    var data = req.body;
+    user.set(data);
     if (user.isValid()) {
-        collection.update({ "ID": id }, user.toJSON());
-        res.status(200).send(data);
+        user.update({
+            "success": function() {
+                res.status(200).send("updated");
+            },
+            "error": function(e) {
+                res.status(400).send("Failed to save user." + e);
+            }
+        });
+        //collection.update({ "ID": id }, user.toJSON());
+        //res.status(200).send(data);
     } else {
         res.status(400).send(user.validationMessages);
         logger.error(JSON.stringify(user.validationMessages));
@@ -87,8 +123,22 @@ app.put("/users/:id", function(req, res) {
 app.delete("/users/:id", function(req, res) {
     var id = Number(req.params.id);
     if (id) {
-        collection.remove({ "ID": id });
-        res.status(204).send();
+        var user = new User({
+            "datasource": app.datasource,
+            "id": id,
+            "query": { "ID": id }
+        });
+
+        user.destroy({
+            "success": function() {
+                res.status(204).send("");
+            },
+            "error": function(e) {
+                res.status(400).send("Failed to delete user." + e);
+            }
+        });
+        //collection.remove({ "ID": id });
+        //res.status(204).send();
     } else {
         res.status(400).send("No ID to delete!");
         logger.error("No ID to delete!");

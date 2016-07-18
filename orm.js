@@ -8,6 +8,6 @@ exports.User = (User) = Augmented.Service.Entity.extend({
     schema: schema.user
 });
 
-exports.Users = Augmented.Collection.extend({
+exports.Users = Augmented.Service.Collection.extend({
     model: User
 });
