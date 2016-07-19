@@ -1,3 +1,4 @@
+XMLHttpRequest = require("xhr2");
 var express = require("express");
 var Augmented = require("augmentedjs");
 var Service = require("./lib/service.js");
