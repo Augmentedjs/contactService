@@ -85,10 +85,16 @@ app.post("/users", function(req, res) {
 app.put("/users/:id", function(req, res) {
     var id = Number(req.params.id);
     var data = req.body;
-    var user = new User(data);
+    /*var user = new User(data);
     user.datasource = app.datasource;
     user.id = id;
-    user.query = { "ID": id };
+    user.query = { "ID": id };*/
+    var user = new User({
+        "datasource": app.datasource,
+        "id": id,
+        "query": { "ID": id }
+    });
+    user.set(data);
 
     if (user.isValid()) {
         user.update({
