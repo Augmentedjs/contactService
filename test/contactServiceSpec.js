@@ -1,7 +1,7 @@
 XMLHttpRequest = require("xhr2");
 var Augmented = require("../lib/augmented.js");
 Augmented.Service = require("../lib/service.js");
-var Mock = require("../mock.js");s
+var Mock = require("../mock.js");
 var ORM = require("../orm.js");
 var User = ORM.User;
 var Users = ORM.Users;

@@ -21,11 +21,11 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 /* REST API */
 
-app.get("/", function() {
+app.get("/", function(req, res) {
 	res.send(ABOUT);
 });
 
-app.get("/about", function() {
+app.get("/about", function(req, res) {
     res.send(ABOUT);
 });
 
