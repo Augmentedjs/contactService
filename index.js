@@ -1,6 +1,6 @@
 XMLHttpRequest = require("xhr2");
-var Augmented = require("./lib/augmented.js");
-Augmented.Service = require("./lib/service.js");
+var Augmented = require("augmentedjs");
+Augmented.Service = require("augmentedjs-service");
 var express = require("express");
 var bodyParser = require("body-parser");
 var DataSource = require("./datasource.js");
@@ -21,11 +21,11 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 /* REST API */
 
-app.get("/", function() {
+app.get("/", function(req, res) {
 	res.send(ABOUT);
 });
 
-app.get("/about", function() {
+app.get("/about", function(req, res) {
     res.send(ABOUT);
 });
 

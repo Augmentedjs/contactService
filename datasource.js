@@ -1,8 +1,8 @@
 var MongoClient = require("mongodb").MongoClient;
 var assert = require("assert");
 var ObjectId = require("mongodb").ObjectID;
-var Augmented = require("./lib/augmented.js");
-Augmented.Service = require("./lib/service.js");
+var Augmented = require("augmentedjs");
+Augmented.Service = require("augmentedjs-service");
 
 
 console.log("Service? " + (Augmented.Service.DataSourceFactory !== null));

@@ -1,5 +1,5 @@
-var Augmented = require("./lib/augmented.js");
-var Service = require("./lib/service.js");
+var Augmented = require("augmentedjs");
+Augmented.Service = require("augmentedjs-service");
 var Schema = require("./userSchema.js");
 var DataSource = require("./datasource.js");
 
